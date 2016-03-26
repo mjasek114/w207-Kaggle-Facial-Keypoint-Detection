@@ -72,7 +72,7 @@ w_o = init_weights("w_o", (100, 30))
 w_o_printed = theano.printing.Print('Weights on output layer')(w_o)
 
 noise_h, noise_py_x = model(X, w_h, w_o, 0.2, 0.5)
-h, h2, py_x = model(X, w_h, w_o, 0., 0.)
+h, py_x = model(X, w_h, w_o, 0., 0.)
 
 xent = (Y - noise_py_x)**2 # L2 distance for cost
 cost = xent.mean() # The cost to minimize (MSE)
