@@ -47,14 +47,16 @@ def dropout(X, p=0.):
         X /= retain_prob
     return X
 
-def model(X, w_h, w_o, p_drop_input, p_drop_hidden):
+def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
     X = dropout(X, p_drop_input)
-
     h = rectify(T.dot(X, w_h))
-    h = dropout(h, p_drop_hidden)
 
-    py_x = rectify(T.dot(h, w_o))
-    return h, py_x
+    h = dropout(h, p_drop_hidden)
+    h2 = rectify(T.dot(h, w_h2))
+
+    h2 = dropout(h2, p_drop_hidden)
+    py_x = rectify(T.dot(h2, w_o))
+    return h, h2, py_x
 
 
 allX, allY = Load.load()
@@ -67,17 +69,18 @@ deY = allY[1800:]
 X = T.fmatrix("X")
 Y = T.fmatrix("Y")
 
-w_h = init_weights("w_h", (9216, 100))
-w_o = init_weights("w_o", (100, 30))
+w_h = init_weights("w_h", (9216, 6400))
+w_h2 = init_weights("w_h2", (6400, 6400))
+w_o = init_weights("w_o", (6400, 30))
 w_o_printed = theano.printing.Print('Weights on output layer')(w_o)
 
-noise_h, noise_py_x = model(X, w_h, w_o, 0.2, 0.5)
-h, h2, py_x = model(X, w_h, w_o, 0., 0.)
+noise_h, noise_h2, noise_py_x = model(X, w_h, w_h2, w_o, 0.2, 0.5)
+h, h2, py_x = model(X, w_h, w_h2, w_o, 0., 0.)
 
 xent = (Y - noise_py_x)**2 # L2 distance for cost
 cost = xent.mean() # The cost to minimize (MSE)
 
-params = [w_h, w_o]
+params = [w_h, w_h2, w_o]
 updates = sgd(cost, params, lr=0.01)
 
 train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
@@ -95,4 +98,4 @@ def gradientDescentStochastic(epochs):
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(400)    
+gradientDescentStochastic(100)    
