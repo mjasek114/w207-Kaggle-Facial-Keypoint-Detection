@@ -83,7 +83,7 @@ updates = sgd(cost, params, lr=0.01)
 train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
 predict = theano.function(inputs=[X], outputs=py_x, allow_input_downcast=True)
 
-miniBatchSize = 128
+miniBatchSize = 1
 def gradientDescentStochastic(epochs):
     trainTime = 0.0
     predictTime = 0.0
@@ -91,7 +91,7 @@ def gradientDescentStochastic(epochs):
     for i in range(epochs):       
         for start, end in zip(range(0, len(trX), miniBatchSize), range(miniBatchSize, len(trX), miniBatchSize)):
             cost = train(trX[start:end], trY[start:end])
-            print '%d) precision=%.4f, cost=%.4f' %(i+1, np.mean(np.allclose(deY, predict(deX))), cost)
+        print '%d) precision=%.4f, cost=%.4f' %(i+1, np.mean(np.allclose(deY, predict(deX))), cost)
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
