@@ -55,7 +55,7 @@ def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
     h2 = rectify(T.dot(h, w_h2))
 
     h2 = dropout(h2, p_drop_hidden)
-    py_x = rectify(T.dot(h2, w_o))
+    py_x = T.dot(h2, w_o)
     return h, h2, py_x
 
 
@@ -69,16 +69,15 @@ deY = allY[1800:]
 X = T.fmatrix("X")
 Y = T.fmatrix("Y")
 
-w_h = init_weights("w_h", (9216, 6400))
-w_h2 = init_weights("w_h2", (6400, 6400))
-w_o = init_weights("w_o", (6400, 30))
+w_h = init_weights("w_h", (9216, 100))
+w_h2 = init_weights("w_h2", (100, 100))
+w_o = init_weights("w_o", (100, 30))
 w_o_printed = theano.printing.Print('Weights on output layer')(w_o)
 
 noise_h, noise_h2, noise_py_x = model(X, w_h, w_h2, w_o, 0.2, 0.5)
 h, h2, py_x = model(X, w_h, w_h2, w_o, 0., 0.)
 
-xent = (Y - noise_py_x)**2 # L2 distance for cost
-cost = xent.mean() # The cost to minimize (MSE)
+cost = ((Y - noise_py_x)**2).mean() # L2 distance for cost
 
 params = [w_h, w_h2, w_o]
 updates = sgd(cost, params, lr=0.01)
@@ -86,7 +85,7 @@ updates = sgd(cost, params, lr=0.01)
 train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
 predict = theano.function(inputs=[X], outputs=py_x, allow_input_downcast=True)
 
-miniBatchSize = 128
+miniBatchSize = 1
 def gradientDescentStochastic(epochs):
     trainTime = 0.0
     predictTime = 0.0
@@ -94,8 +93,10 @@ def gradientDescentStochastic(epochs):
     for i in range(epochs):       
         for start, end in zip(range(0, len(trX), miniBatchSize), range(miniBatchSize, len(trX), miniBatchSize)):
             cost = train(trX[start:end], trY[start:end])
-            print '%d) precision=%.4f, cost=%.4f' %(i+1, np.mean(np.allclose(deY, predict(deX))), cost)
+            pdeY = predict(deX)
+            cost_de = ((deY - pdeY)**2).mean()
+            print '%d) precision=%.4f, Traning cost=%.4f, DE cost: %.4f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(100)    
+gradientDescentStochastic(10)    

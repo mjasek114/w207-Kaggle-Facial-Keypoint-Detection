@@ -1,10 +1,14 @@
+#%matplotlib inline
+
 import theano
 from theano import tensor as T
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 import numpy as np
 import time
-from Data import Load
+import matplotlib
+from matplotlib import pyplot
 
+from Data import Load
 
 srng = RandomStreams()
 
@@ -16,10 +20,6 @@ def init_weights(name, shape):
 
 def rectify(X):
     return T.maximum(X, 0.)
-
-def softmax(X):
-    e_x = T.exp(X - X.max(axis=1).dimshuffle(0, 'x'))
-    return e_x / e_x.sum(axis=1).dimshuffle(0, 'x')
 
 def RMSprop(cost, params, lr=0.001, rho=0.9, epsilon=1e-6):
     grads = T.grad(cost=cost, wrt=params)
@@ -53,9 +53,8 @@ def model(X, w_h, w_o, p_drop_input, p_drop_hidden):
     h = rectify(T.dot(X, w_h))
     h = dropout(h, p_drop_hidden)
 
-    py_x = rectify(T.dot(h, w_o))
+    py_x = T.dot(h, w_o)
     return h, py_x
-
 
 allX, allY = Load.load()
 trX = allX[:1800]
@@ -63,22 +62,19 @@ trY = allY[:1800]
 deX = allX[1800:]
 deY = allY[1800:]
 
-
 X = T.fmatrix("X")
 Y = T.fmatrix("Y")
 
 w_h = init_weights("w_h", (9216, 100))
 w_o = init_weights("w_o", (100, 30))
-w_o_printed = theano.printing.Print('Weights on output layer')(w_o)
 
 noise_h, noise_py_x = model(X, w_h, w_o, 0.2, 0.5)
 h, py_x = model(X, w_h, w_o, 0., 0.)
 
-xent = (Y - noise_py_x)**2 # L2 distance for cost
-cost = xent.mean() # The cost to minimize (MSE)
+cost = ((Y - noise_py_x)**2).mean()
 
 params = [w_h, w_o]
-updates = sgd(cost, params, lr=0.01)
+updates = sgd(cost, params, lr=.01)
 
 train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
 predict = theano.function(inputs=[X], outputs=py_x, allow_input_downcast=True)
@@ -91,8 +87,33 @@ def gradientDescentStochastic(epochs):
     for i in range(epochs):       
         for start, end in zip(range(0, len(trX), miniBatchSize), range(miniBatchSize, len(trX), miniBatchSize)):
             cost = train(trX[start:end], trY[start:end])
-        print '%d) precision=%.4f, cost=%.4f' %(i+1, np.mean(np.allclose(deY, predict(deX))), cost)
+        pdeY = predict(deX)
+        cost_de = ((deY - pdeY)**2).mean()
+        print '%d) precision=%.4f, Traning cost=%.4f, DE cost: %.4f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(400)    
+gradientDescentStochastic(10) 
+
+'''
+#
+# Let's see how the predictions come out
+#
+def plot_sample(x, y, y_pred, axis):
+    img = x.reshape(96, 96)
+    axis.imshow(img, cmap='gray')
+    axis.scatter(y[0::2] * 48 + 48, y_pred[1::2] * 48 + 48, marker='x', s=10)
+    axis.scatter(y[0::2] * 48 + 48, y[1::2] * 48 + 48, marker='x', c='r', s=10)
+
+y_pred = predict(deX)
+
+fig = pyplot.figure(figsize=(6, 6))
+fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
+
+
+for i in range(16):
+    ax = fig.add_subplot(4, 4, i + 1, xticks=[], yticks=[])
+    plot_sample(deX[i], deY[i], y_pred[i], ax)
+
+pyplot.show()
+'''
