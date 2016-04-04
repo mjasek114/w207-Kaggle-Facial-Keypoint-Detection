@@ -95,6 +95,10 @@ def gradientDescentStochastic(epochs):
 
 gradientDescentStochastic(10) 
 
+print 'Mean squared error on Training data: %.4f\n'%((trY - trY.mean())**2).mean()
+print 'Mean squared error on Dev data: %.4f\n'%((deY - deY.mean())**2).mean()
+
+
 '''
 #
 # Let's see how the predictions come out
