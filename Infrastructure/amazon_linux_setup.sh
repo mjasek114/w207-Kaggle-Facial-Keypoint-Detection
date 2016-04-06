@@ -11,7 +11,6 @@ sudo pip install scipy
 sudo pip install maptlotlib
 sudo pip install scikit-learn
 sudo pip install scikit-image
-sudo pip install jupyter
 sudo pip install --upgrade https://github.com/Theano/Theano/archive/master.zip
 sudo pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
 
@@ -35,3 +34,4 @@ wget -O firefox-latest.tar.bz2 \
 
 bzcat firefox-latest.tar.bz2 | tar xvf -
 
+sudo pip install jupyter
