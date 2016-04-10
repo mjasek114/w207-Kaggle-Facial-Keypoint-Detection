@@ -33,16 +33,18 @@ def load(test=False, cols=None):
     if not test:  # only FTRAIN has any target columns
         y = df[df.columns[:-1]].values
         y = (y - 48) / 48  # scale target coordinates to [-1, 1]
-        X, y = shuffle(X, y, random_state=42)  # shuffle train data
+        #X, y = shuffle(X, y, random_state=42)  # shuffle train data
         y = y.astype(np.float32)
     else:
         y = None
 
+    print("X.shape == {0}; X.min == {1:.3f}; X.max == {2:.3f}".format(
+        X.shape, X.min(), X.max()))
+    print("y.shape == {0}; y.min == {1:.3f}; y.max == {2:.3f}".format(
+        y.shape, y.min(), y.max()))    
+    
     return X, y
 
 
-X, y = load()
-print("X.shape == {0}; X.min == {1:.3f}; X.max == {2:.3f}".format(
-    X.shape, X.min(), X.max()))
-print("y.shape == {0}; y.min == {1:.3f}; y.max == {2:.3f}".format(
-    y.shape, y.min(), y.max()))
+
+
