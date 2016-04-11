@@ -12,6 +12,7 @@ from Data import Load
 import csv
 import os
 import pickle
+import sys
 
 all_X, all_Y = Load.load()
 
@@ -346,7 +347,7 @@ def gradientDescentStochastic(epochs):
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(1) 
+gradientDescentStochastic(1000) 
 
 print 'Mean squared error on Training data: %.4f\n'%((trY - trY.mean())**2).mean()
 print 'Mean squared error on Dev data: %.4f\n'%((deY - deY.mean())**2).mean()
@@ -359,10 +360,14 @@ print 'Mean squared error on Dev data: %.4f\n'%((deY - deY.mean())**2).mean()
 pdeY = predict(deX)
 
 # Write to csv
-file_path = os.path.dirname(os.path.realpath(__file__)) + 'results.csv'
+file_path = os.path.dirname(os.path.realpath(__file__)) + '/results.csv'
+print ('Writing CSV file: {0}', file_path)
+
 with open(file_path, 'wb') as csvfile:
     csv_writer = csv.writer(csvfile, delimiter=',') 
     array_str = str()
     for index in range(pdeY.shape[0]):
         serialized = pickle.dumps(pdeY[index], protocol=0) # protocol 0 is printable ASCII
         csv_writer.writerow([index, serialized])
+
+sys.stdout.flush()
