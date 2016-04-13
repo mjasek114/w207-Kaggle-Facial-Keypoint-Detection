@@ -158,18 +158,15 @@ class HiddenLayer(object):
         if W is None:
             W = init_weights("w_h", (n_in, n_out))
 
-        '''
         if b is None:
             b_values = numpy.zeros((n_out,), dtype=theano.config.floatX)
             b = theano.shared(value=b_values, name='b', borrow=True)
-        '''    
+
         self.W = W
         self.b = b
-        #self.params = [self.W, self.b]
-        self.params = [self.W]
+        self.params = [self.W, self.b]
         
-        #lin_output = T.dot(input, self.W) + self.b
-        lin_output = T.dot(input, self.W)
+        lin_output = T.dot(input, self.W) + self.b
         self.output = (
             dropout(lin_output, p_drop) if activation is None
             else dropout(activation(lin_output), p_drop)
@@ -206,7 +203,6 @@ class RegressionLayer(object):
         
         
         # initialize the biases b as a vector of n_out 0s
-        '''
         self.b = theano.shared(
             value=numpy.zeros(
                 (n_out,),
@@ -215,7 +211,6 @@ class RegressionLayer(object):
             name='b',
             borrow=True
         )
-        '''
         
         # symbolic expression for computing the matrix of class-membership
         # probabilities
@@ -225,18 +220,16 @@ class RegressionLayer(object):
         # x is a matrix where row-j  represents input training sample-j
         # b is a vector where element-k represent the free parameter of
         # hyperplane-k
-        #self.y_pred = T.dot(input, self.W) + self.b
         self.y_pred = T.dot(input, self.W)
 
         # parameters of the model
-        #self.params = [self.W, self.b]
-        self.params = [self.W]
+        self.params = [self.W, self.b]
 
         # keep track of model input
         self.input = input
     
     def cost(self, y):
-        return ((y - self.y_pred)**2).mean()
+        return ((y - (self.y_pred + self.b))**2).mean()
         
         
 ################################################################################
