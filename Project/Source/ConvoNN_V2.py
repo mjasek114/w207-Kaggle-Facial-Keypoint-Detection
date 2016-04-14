@@ -75,7 +75,7 @@ y_hat_train = model(X, w_1, w_2, w_3, w_4, w_5, 0.2, 0.5)
 y_hat_predict = model(X, w_1, w_2, w_3, w_4, w_5, 0., 0.)
 
 ## (3) Cost
-cost = ((Y - (y_hat_predict + b_5))**2).mean()
+cost = ((Y - (y_hat_predict))**2).mean()
 
 ## (4) Minimization.  
 def backprop(cost, w, alpha=0.001, rho=0.9, epsilon=1e-6):
@@ -125,7 +125,7 @@ def gradientDescentStochastic(epochs):
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(1)
+gradientDescentStochastic(1000)
 
 print 'Mean squared error on Training data: %.4f\n'%((trY - trY.mean())**2).mean()
 print 'Mean squared error on Dev data: %.4f\n'%((deY - deY.mean())**2).mean()
