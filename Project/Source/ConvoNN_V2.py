@@ -53,13 +53,13 @@ b_5 = theano.shared(value=numpy.zeros((numClasses,), dtype=theano.config.floatX)
 params = [w_1, w_2, w_3, w_4, w_5, b_1, b_2, b_3, b_4, b_5]
 
 ## (2) Model
-X = T.tensor4() # conv2d works with tensor4 type
-Y = T.matrix()
+X = T.matrix('X').reshape((-1, 1, 96, 96)) # conv2d works with tensor4 type
+Y = T.matrix('Y')
 
 srng = RandomStreams()
 def dropout(X, p=0.):
     if p > 0:
-        X *= srng.binomial(X.shape, p=1 - p)
+        X *= srng.binomial(X.shape, p=1 - p, dtype=theano.config.floatX)
         X /= 1 - p
     return X
 
