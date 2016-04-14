@@ -121,14 +121,14 @@ def gradientDescentStochastic(epochs):
             cost = train(trX[start:end], trY[start:end])
         pdeY = predict(deX)
         cost_de = ((deY - pdeY)**2).mean()
-        print '%d) precision=%.4f, Traning cost=%.4f, DE cost: %.4f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
+        print '%d) precision=%.8f, Traning cost=%.8f, DE cost: %.8f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
 gradientDescentStochastic(1000)
 
-print 'Mean squared error on Training data: %.4f\n'%((trY - trY.mean())**2).mean()
-print 'Mean squared error on Dev data: %.4f\n'%((deY - deY.mean())**2).mean()
+print 'Mean squared error on Training data: %.8f\n'%((trY - trY.mean())**2).mean()
+print 'Mean squared error on Dev data: %.8f\n'%((deY - deY.mean())**2).mean()
 
 
 ################################################################################
