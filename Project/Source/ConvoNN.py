@@ -269,7 +269,7 @@ layer0_input = x.reshape((-1, 1, 96, 96))
 # Construct the first convolutional pooling layer:
 # filtering reduces the image size to (96-9+1 , 96-9+1) = (88, 88)
 # maxpooling reduces this further to (88/2, 88/2) = (44, 44)
-# 4D output tensor is thus of shape (miniBatchSize, nkerns[0], 88, 88)
+# 4D output tensor is thus of shape (miniBatchSize, nkerns[0], 44, 44)
 layer0 = LeNetConvPoolLayer(
     rng,
     input=layer0_input,
