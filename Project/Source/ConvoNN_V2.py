@@ -40,8 +40,8 @@ w_2 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer2, feat
 w_3 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer3, featureMapsLayer2, patchWidth, patchHeight))*.01))))
 
 # Fully connected NN. 
-w_4 = theano.shared(np.asarray((np.random.randn(*(featureMapsLayer3 * 7 * 7, numHiddenNodes))*.01)))
-w_5 = theano.shared(np.asarray((np.random.randn(*(numHiddenNodes, numClasses))*.01)))
+w_4 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer3 * 7 * 7, numHiddenNodes))*.01))))
+w_5 = theano.shared(floatX(np.asarray((np.random.randn(*(numHiddenNodes, numClasses))*.01))))
 
 # Bias values
 b_1 = theano.shared(value=numpy.zeros((featureMapsLayer1,), dtype=theano.config.floatX), borrow=True)
