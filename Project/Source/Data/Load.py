@@ -33,8 +33,9 @@ def load(test=False, cols=None):
     if not test:  # only FTRAIN has any target columns
         y = df[df.columns[:-1]].values
         y = (y - 48) / 48  # scale target coordinates to [-1, 1]
-        #X, y = shuffle(X, y, random_state=42)  # shuffle train data
-        y = y.astype(np.float32)
+        y = y.astype(np.float32) 
+        X, y = augment_images(X, y) # Apply image augmentation
+        X, y = shuffle(X, y, random_state=42)  # shuffle train data        
     else:
         y = None
 
@@ -46,5 +47,32 @@ def load(test=False, cols=None):
     return X, y
 
 
+def augment_images(X, Y):
+    
+    flip_indices = [
+        (0, 2), (1, 3),
+        (4, 8), (5, 9), (6, 10), (7, 11),
+        (12, 16), (13, 17), (14, 18), (15, 19),
+        (22, 24), (23, 25),
+        ]
+    
+    # Flip 1/2 of the images in this batch at random
+    X_flipped = X.copy().reshape(-1,96,96)
+    Y_flipped = Y.copy()
+    
+    bs = X_flipped.shape[0]
+    indices = np.random.choice(bs, bs / 2, replace=False)
+    
+    # simple slice to flip all images
+    X_flipped[indices] = X_flipped[indices, :, ::-1]
 
+    
+    # Horizontal flip of all x coordinates:
+    Y_flipped[indices, ::2] = Y_flipped[indices, ::2] * -1
 
+    # Swap places, e.g. left_eye_center_x -> right_eye_center_x
+    for a, b in flip_indices:
+        Y_flipped[indices, a], Y_flipped[indices, b] = (
+            Y_flipped[indices, b], Y_flipped[indices, a])
+    
+    return np.vstack((X, X_flipped[indices].reshape(-1,96*96))), np.vstack((Y, Y_flipped[indices]))
