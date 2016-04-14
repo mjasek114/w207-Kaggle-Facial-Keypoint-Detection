@@ -128,7 +128,7 @@ def gradientDescentStochastic(epochs):
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
 
-gradientDescentStochastic(1)
+gradientDescentStochastic(1000)
 
 print 'Mean squared error on Training data: %.8f\n'%((trY - trY.mean())**2).mean()
 print 'Mean squared error on Dev data: %.8f\n'%((deY - deY.mean())**2).mean()
