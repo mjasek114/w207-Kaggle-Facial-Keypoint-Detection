@@ -19,6 +19,9 @@ from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 from theano.tensor.nnet.conv import conv2d
 from theano.tensor.signal.downsample import max_pool_2d
 
+def floatX(X):
+    return np.asarray(X, dtype=theano.config.floatX)
+
 ## (1) Parameters
 numClasses = 30
 numHiddenNodes = 600 
@@ -32,9 +35,9 @@ featureMapsLayer3 = 128
 imageWidth = 96
 
 # Convolution layers.  
-w_1 = theano.shared(np.asarray((np.random.randn(*(featureMapsLayer1, 1, patchWidth, patchHeight))*.01)))
-w_2 = theano.shared(np.asarray((np.random.randn(*(featureMapsLayer2, featureMapsLayer1, patchWidth, patchHeight))*.01)))
-w_3 = theano.shared(np.asarray((np.random.randn(*(featureMapsLayer3, featureMapsLayer2, patchWidth, patchHeight))*.01)))
+w_1 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer1, 1, patchWidth, patchHeight))*.01))))
+w_2 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer2, featureMapsLayer1, patchWidth, patchHeight))*.01))))
+w_3 = theano.shared(floatX(np.asarray((np.random.randn(*(featureMapsLayer3, featureMapsLayer2, patchWidth, patchHeight))*.01))))
 
 # Fully connected NN. 
 w_4 = theano.shared(np.asarray((np.random.randn(*(featureMapsLayer3 * 7 * 7, numHiddenNodes))*.01)))
