@@ -62,7 +62,7 @@ def transpose_images(X, Y):
     Y_flipped = Y.copy()
     
     bs = X_flipped.shape[0]
-    indices = np.random.choice(bs, bs / 2, replace=False)
+    indices = np.random.choice(bs, bs / 6, replace=False)
     
     # simple slice to flip all images
     X_flipped[indices] = X_flipped[indices, :, ::-1]
@@ -82,7 +82,7 @@ def blurr_images(X, Y):
 
     # Flip 1/2 of the images in this batch at random
     bs = X.shape[0]
-    indices = np.random.choice(bs, bs / 2, replace=False)
+    indices = np.random.choice(bs, bs / 6, replace=False)
 
     X_blurred = X[indices].copy().reshape(-1,96,96)
     X_blurred *= 255.0
@@ -101,7 +101,7 @@ def rotate_images(X, Y):
     
     # Select 1/2 of the images to rotate randomly left or right
     bs = X.shape[0]
-    indices = np.random.choice(bs, bs / 2, replace=False)
+    indices = np.random.choice(bs, bs / 6, replace=False)
 
     X_rot = X[indices].copy().reshape(-1,96,96)
     X_rot *= 255.0
