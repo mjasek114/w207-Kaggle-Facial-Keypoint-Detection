@@ -140,7 +140,7 @@ def gradientDescentStochastic(epochs):
         
         # Capture the traning and dev costs on each epoch
         training_costs.append(cost)
-        dev_cost.append(cost_de)
+        dev_costs.append(cost_de)
         
         print '%d) precision=%.8f, Traning cost=%.8f, DE cost: %.8f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
         trainTime =  trainTime + (time.time() - start_time)
