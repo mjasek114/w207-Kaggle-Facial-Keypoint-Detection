@@ -76,7 +76,7 @@ def transpose_images(X, Y):
         Y_flipped[indices, a], Y_flipped[indices, b] = (
             Y_flipped[indices, b], Y_flipped[indices, a])
     
-    return np.vstack((X, X_flipped[indices].reshape(-1,96*96))), np.vstack((Y, Y_flipped[indices]))
+    return X_flipped[indices].reshape(-1,96*96), Y_flipped[indices]
 
 def blurr_images(X, Y):
 

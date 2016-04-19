@@ -108,11 +108,11 @@ all_X, all_Y = Load.load()
 rot_X, rot_Y = Load.rotate_images(all_X, all_Y)
 blur_X, blur_Y = Load.blurr_images(all_X, all_Y)
 tr_X, tr_Y = Load.transpose_images(all_X, all_Y)
-all_X, all_Y = all_X[:all_X.shape[0]/2,:], all_Y[:all_Y.shape[0]/2,:]
 
 all_X, all_Y = np.vstack((all_X, rot_X)), np.vstack((all_Y, rot_Y))
 all_X, all_Y = np.vstack((all_X, blur_X)), np.vstack((all_Y, blur_Y))
 all_X, all_Y = np.vstack((all_X, tr_X)), np.vstack((all_Y, tr_Y))
+rot_X, rot_Y, blur_X, blur_Y, tr_X, tr_Y = None, None, None, None, None, None
 
 test_indices = np.random.choice(all_X.shape[0], .8*all_X.shape[0], replace=False)
 keep = np.ones(all_X.shape[0], dtype=bool) # array of True matching 1st dim
