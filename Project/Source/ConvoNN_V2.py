@@ -105,17 +105,30 @@ predict = theano.function(inputs=[X], outputs=y_pred, allow_input_downcast=True)
 # Model Execution
 ################################################################################
 all_X, all_Y = Load.load()
+rot_X, rot_Y = Load.rotate_images(all_X, all_Y)
+blur_X, blur_Y = Load.blurr_images(all_X, all_Y)
+tr_X, tr_Y = Load.transpose_images(all_X, all_Y)
 
-trX = all_X[:2800]
-trY = all_Y[:2800]
-deX = all_X[2800:]
-deY = all_Y[2800:]
+all_X, all_Y = np.vstack((all_X, rot_X)), np.vstack((all_Y, rot_Y))
+all_X, all_Y = np.vstack((all_X, blur_X)), np.vstack((all_Y, blur_Y))
+all_X, all_Y = np.vstack((all_X, tr_X)), np.vstack((all_Y, tr_Y))
+
+test_indices = np.random.choice(all_X.shape[0], .8*all_X.shape[0], replace=False)
+keep = np.ones(all_X.shape[0], dtype=bool) # array of True matching 1st dim
+keep[test_indices] = False
+trX = all_X[keep,:]
+trY = all_Y[keep,:]
+
+deX = all_X[test_indices]
+deY = all_Y[test_indices]
 
 trX = trX.reshape(-1, 1, imageWidth, imageWidth)
 deX = deX.reshape(-1, 1, imageWidth, imageWidth)
 
 miniBatchSize = 1
 def gradientDescentStochastic(epochs):
+    training_costs=[]
+    dev_costs=[]
     trainTime = 0.0
     predictTime = 0.0
     start_time = time.time()
@@ -124,11 +137,18 @@ def gradientDescentStochastic(epochs):
             cost = train(trX[start:end], trY[start:end])
         pdeY = predict(deX)
         cost_de = ((deY - pdeY)**2).mean()
+        
+        # Capture the traning and dev costs on each epoch
+        training_costs.append(cost)
+        dev_cost.append(cost_de)
+        
         print '%d) precision=%.8f, Traning cost=%.8f, DE cost: %.8f' %(i+1, np.mean(np.allclose(deY, pdeY)), cost, cost_de)
         trainTime =  trainTime + (time.time() - start_time)
     print 'train time = %.2f' %(trainTime)
+    
+    return training_costs, dev_costs
 
-gradientDescentStochastic(1000)
+training_costs, dev_costs = gradientDescentStochastic(1)
 
 print 'Mean squared error on Training data: %.8f\n'%((trY - trY.mean())**2).mean()
 print 'Mean squared error on Dev data: %.8f\n'%((deY - deY.mean())**2).mean()
